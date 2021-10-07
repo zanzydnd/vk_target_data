@@ -26,22 +26,10 @@ class Result(models.Model):
     interest = models.ForeignKey(InterestCategory, on_delete=models.SET_NULL, related_name="results")
     link = models.CharField(max_length=100000)
     count_of_person = models.BigIntegerField(default=0)
-    begin_date = models.DateTimeField(auto_now=True)
-    end_date = models.DateTimeField()
+    begin_date = models.DateTimeField()
+    end_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "result"
         verbose_name = "Результат"
         verbose_name_plural = "Результаты"
-
-
-class FailedResult(Result):
-    is_fixed = models.BooleanField(default=False)
-    error_msg = models.CharField(max_length=100000, default="Error")
-    error_code = models.IntegerField(null=True)
-    last_fix_try_date = models.DateTimeField()
-
-    class Meta:
-        db_table = "failed_result"
-        verbose_name = "Не полученный результат"
-        verbose_name_plural = "Не полученные результаты"

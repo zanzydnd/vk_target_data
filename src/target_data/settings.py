@@ -122,14 +122,9 @@ STATIC_URL = '/static/'
 REDIS_CONNECTION = os.environ.get("REDIS_CONNECTION", "redis://redis:6379")
 CELERY_BROKER_URL = REDIS_CONNECTION
 CELERY_BEAT_SCHEDULE = {
-    "check_databases": {
-        "task": "main.tasks.check_databases",
+    "get_data_vk_api": {
+        "task": "main.tasks.get_data_vk_api",
         "schedule": crontab(minute="*/10"),
         "args": (),
     },
-    "check_parsers_db": {
-        "task": "main.tasks.check_parser_db",
-        "schedule": crontab(minute="*/1"),
-        "args": (),
-    }
 }

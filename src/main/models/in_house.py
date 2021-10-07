@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class ApiKeys(models.Model):
+class ApiKey(models.Model):
     key = models.CharField(max_length=10000)
     is_taken = models.BooleanField(default=False)
 
