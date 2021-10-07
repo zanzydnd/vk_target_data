@@ -7,9 +7,10 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from user_agent import generate_user_agent
 
+from main.exceptions import TooManyRequestsError
 from main.models import InterestCategory, Coord, Result
 from main.models.in_house import ApiKey
-from main.services import get_points_by_interest_name_service
+from main.services import get_points_by_interest_name_service, make_request_to_api
 
 
 @csrf_exempt
@@ -31,6 +32,9 @@ def test_services(request):
         return
     interests = InterestCategory.objects.all().select_related("results")
     points = Coord.objects.all()
-
-            if response.json().get('error') == 601:
+    for interest in interests:
+        for point in points:
+            try:
+                make_request_to_api(token, interest, point)
+            except TooManyRequestsError as tmn_e:
                 pass
