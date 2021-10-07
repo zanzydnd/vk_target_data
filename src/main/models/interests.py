@@ -20,17 +20,6 @@ class Coord(models.Model):
         verbose_name = "Координата"
         verbose_name_plural = "Координаты"
 
-# !Это не нужно можно просто по полям результата смотреть.
-class RequestsCoordInterestCombination(models.Model):
-    coord = models.ForeignKey(Coord, on_delete=models.CASCADE, related_name="executed_interest")
-    interest = models.ForeignKey(InterestCategory, on_delete=models.CASCADE, related_name="executed_coord")
-
-    class Meta:
-        unique_together = ['coord', 'interest']
-        db_table = "request_comb_interest_coord"
-        verbose_name = "Использованное сочетание coord + interest"
-        verbose_name_plural = "Использованные сочетания coord + interest"
-
 
 class Result(models.Model):
     coordinate = models.ForeignKey(Coord, on_delete=models.SET_NULL, related_name="results")
