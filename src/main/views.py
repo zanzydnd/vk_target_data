@@ -1,10 +1,11 @@
 from django.core import serializers
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
 
 from main.services import get_points_by_interest_name_service
 
 
+@csrf_exempt
 def get_points_json_view(request):
     if request.is_ajax() and request.method == "GET":
         if request.GET.get("interest_name"):
