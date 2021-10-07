@@ -11,10 +11,6 @@ from main.models import InterestCategory, Coord, Result
 from main.models.in_house import ApiKey
 from main.services import get_points_by_interest_name_service
 
-API_URL = "https://api.vk.com/method/ads.getTargetingStats"
-LINK_URL = "https://vk.com/dev/ads.getTargetingStats"
-LINK_DOMAIN = "vk.com"
-
 
 @csrf_exempt
 def get_points_json_view(request):
@@ -35,18 +31,6 @@ def test_services(request):
         return
     interests = InterestCategory.objects.all().select_related("results")
     points = Coord.objects.all()
-    for interest in interests:
-        for point in points:
-            results_qs = Result.objects.filter(coordinate=point, interest=interest).order_by("-end_date")
-            if (datetime.datetime.now() - results_qs[0].end_date).days < 10:
-                continue
-            criter = {
-                "interest_categories": interest.interes_name,
-                "geo_near": f"{point.x},{point.y},500"
-            }
-            json_geo = json.dumps(criter)
-            params_dict = {"account_id=": 123, "access_token": token.key, "v": "5.131", "link_url": API_URL,
-                           "link_domain": LINK_DOMAIN, "criteria": json_geo}
-            response = requests.post(API_URL, params=params_dict, headers=generate_user_agent())
+
             if response.json().get('error') == 601:
                 pass
