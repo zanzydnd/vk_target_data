@@ -51,4 +51,4 @@ class Command(BaseCommand):
                         data.append(Coord(x=x, y=y))
             y = min_y
 
-        Coord.objects.bulk_create(data)
+        Coord.objects.bulk_create(data, ignore_conflicts=True)

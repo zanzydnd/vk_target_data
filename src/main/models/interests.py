@@ -11,8 +11,8 @@ class InterestCategory(models.Model):
 
 
 class Coord(models.Model):
-    x = models.IntegerField()
-    y = models.IntegerField()
+    x = models.DecimalField(max_digits=30, decimal_places=15)
+    y = models.DecimalField(max_digits=30, decimal_places=15)
 
     class Meta:
         unique_together = ['x', 'y']

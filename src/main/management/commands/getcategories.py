@@ -1,3 +1,5 @@
+import os
+
 from django.core.management import BaseCommand
 import vk_api
 
@@ -6,7 +8,7 @@ from main.models import InterestCategory
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        session = vk_api.VkApi(token="")
+        session = vk_api.VkApi(token=os.environ.get("API_KEY"))
 
         vk = session.get_api()
 
