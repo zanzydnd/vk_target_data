@@ -35,3 +35,11 @@ services:
     command: celery -A target_data beat -l debug
     ports: [ ]
     volumes: [ ]
+
+  redis:
+    image: redis:6-alpine
+    ports:
+      - 6379:6379
+
+volumes:
+  static:
