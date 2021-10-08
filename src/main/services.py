@@ -39,7 +39,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
         "geo_near": f"{point.x},{point.y},500"
     }
     json_geo = json.dumps(criter)
-    params_dict = {"account_id=": 123, "access_token": token.key, "v": "5.131", "link_url": API_URL,
+    params_dict = {"account_id=": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
     response = requests.post(API_URL, params=params_dict, headers=generate_user_agent())
     if response.json().get("error"):
