@@ -15,13 +15,3 @@ def get_data_vk_api():
     for interest in interests:
         for point in points:
             make_request_to_api(interest, point, try_num=1, err_cnt=0)
-
-
-@app.task
-def update_api_keys():
-    pass
-
-
-@app.task
-def check_old_ones():
-    pass

@@ -3,7 +3,7 @@ from django.db import models
 
 class ApiKey(models.Model):
     key = models.CharField(max_length=10000)
-    is_taken = models.BooleanField(default=False)
+    expired = models.BooleanField(default=False)
 
     class Meta:
         db_table = "api_keys"

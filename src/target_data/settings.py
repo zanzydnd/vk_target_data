@@ -14,6 +14,9 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from celery.schedules import crontab
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'main'
 ]
 
 MIDDLEWARE = [
@@ -80,6 +84,9 @@ DATABASES = {
         "PASSWORD": os.environ.get("DB_PASSWORD", "name"),
         "HOST": os.environ.get("DB_HOST", "127.0.0.1"),
         "PORT": os.environ.get("DB_PORT", "3306"),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+        }
     }
 }
 
@@ -124,7 +131,7 @@ CELERY_BROKER_URL = REDIS_CONNECTION
 CELERY_BEAT_SCHEDULE = {
     "get_data_vk_api": {
         "task": "main.tasks.get_data_vk_api",
-        "schedule": crontab(minute="*/10"),
+        "schedule": crontab(minute="10", hour="0", day_of_month="*/1"),
         "args": (),
     },
 }

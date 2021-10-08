@@ -25,7 +25,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     if err_cnt >= 10:
         return
     try:
-        token = ApiKey.objects.filter(is_taken=False)[try_num - 1]
+        token = ApiKey.objects.filter(expired=False)[try_num - 1]
     except IndexError as e:
         return
     if not token:

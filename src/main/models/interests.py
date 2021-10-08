@@ -2,7 +2,7 @@ from django.db import models
 
 
 class InterestCategory(models.Model):
-    interes_name = models.CharField(max_length=1000, unique=True)
+    interes_name = models.CharField(max_length=200, unique=True)
 
     class Meta:
         db_table = "interest_category"
@@ -22,9 +22,9 @@ class Coord(models.Model):
 
 
 class Result(models.Model):
-    coordinate = models.ForeignKey(Coord, on_delete=models.SET_NULL, related_name="results")
-    interest = models.ForeignKey(InterestCategory, on_delete=models.SET_NULL, related_name="results")
-    link = models.CharField(max_length=100000)
+    coordinate = models.ForeignKey(Coord, on_delete=models.SET_NULL, null=True, related_name="results")
+    interest = models.ForeignKey(InterestCategory, on_delete=models.SET_NULL, null=True, related_name="results")
+    link = models.TextField(max_length=100000)
     count_of_person = models.BigIntegerField(default=0)
     begin_date = models.DateTimeField()
     end_date = models.DateTimeField(auto_now=True)
