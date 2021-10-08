@@ -27,14 +27,8 @@ def get_points_json_view(request):
 
 
 def test_services(request):
-    token = ApiKey.objects.filter(is_taken=False)[0]
-    if not token:
-        return
     interests = InterestCategory.objects.all().select_related("results")
     points = Coord.objects.all()
     for interest in interests:
         for point in points:
-            try:
-                make_request_to_api(token, interest, point)
-            except TooManyRequestsError as tmn_e:
-                pass
+            make_request_to_api(interest, point, try_num=1, err_cnt=0)
