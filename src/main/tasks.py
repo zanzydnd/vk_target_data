@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @app.task
 def get_data_vk_api():
-    interests = InterestCategory.objects.all().select_related("results")
+    interests = InterestCategory.objects.all()
     points = Coord.objects.all()
     for interest in interests:
         for point in points:

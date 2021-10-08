@@ -31,7 +31,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     if not token:
         return
     results_qs = Result.objects.filter(coordinate=point, interest=interest).order_by("-end_date")
-    if (datetime.datetime.now() - results_qs[0].end_date).days < 10:
+    if results_qs and (timezone.now() - results_qs[0].end_date).days < 10:
         return
     entity = Result(begin_date=timezone.now())
     criter = {
@@ -39,11 +39,14 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
         "geo_near": f"{point.x},{point.y},500"
     }
     json_geo = json.dumps(criter)
-    params_dict = {"account_id=": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
+    params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
-    response = requests.post(API_URL, params=params_dict, headers=generate_user_agent())
+    response = requests.post(API_URL, params=params_dict, headers={"User_Agent" : generate_user_agent()})
+    print(response.json())
+    time.sleep(20)
     if response.json().get("error"):
         if response.json().get("error_code") == 601:
+
             make_request_to_api(interest, point, try_num=try_num + 1, err_cnt=err_cnt)
         else:
             time.sleep(1000)
