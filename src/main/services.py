@@ -50,7 +50,6 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     time.sleep(20)
     if response.json().get("error"):
         if response.json().get("error_code") == 601:
-
             make_request_to_api(interest, point, try_num=try_num + 1, err_cnt=err_cnt)
         else:
             time.sleep(1000)
