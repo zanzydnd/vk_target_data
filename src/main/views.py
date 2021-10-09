@@ -26,7 +26,7 @@ def get_points_json_view(request):
 
 
 def get_map_template(request):
-    return render(request, "map_template.html")
+    return render(request, "map_template.html", {"interests": InterestCategory.objects.all()})
 
 
 def test_services(request):

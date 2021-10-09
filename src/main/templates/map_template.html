@@ -80,9 +80,9 @@
 
 <div>
     <select id="interest">
-        <option>IT услуги</option>
-        <option>Авто и мото</option>
-        <option>Автовладельцы</option>
+        {% for interest in interests %}
+            <option>{{ interest.interes_name }}</option>
+        {% endfor %}
     </select>
     <button type="button" onclick="get_points()">Применить.</button>
 </div>

@@ -38,8 +38,10 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     entity = Result(begin_date=timezone.now())
     criter = {
         "interest_categories": interest.interes_name,
-        "geo_near": f"{point.x},{point.y},500"
+        "geo_near": f"{point.y},{point.x},500"
     }
+    # latitude - широта - y
+    # longitude - долгота - x
     json_geo = json.dumps(criter)
     params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
