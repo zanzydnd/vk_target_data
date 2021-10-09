@@ -4,6 +4,9 @@ from django.db import models
 class InterestCategory(models.Model):
     interes_name = models.CharField(max_length=200, unique=True)
 
+    def natural_key(self):
+        return (self.interes_name)
+
     class Meta:
         db_table = "interest_category"
         verbose_name = "Интерес"
@@ -13,6 +16,9 @@ class InterestCategory(models.Model):
 class Coord(models.Model):
     x = models.DecimalField(max_digits=30, decimal_places=15)
     y = models.DecimalField(max_digits=30, decimal_places=15)
+
+    def natural_key(self):
+        return (self.x, self.y)
 
     class Meta:
         unique_together = ['x', 'y']

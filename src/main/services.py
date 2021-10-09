@@ -12,7 +12,9 @@ from main.models.in_house import ApiKey
 
 
 def get_points_by_interest_name_service(interest_name: str):
-    return Result.objects.filter(interest__interes_name=interest_name, count_of_person__gt=0).select_related(
+    date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
+    return Result.objects.filter(interest__interes_name=interest_name, count_of_person__gt=0,
+                                 end_date__gte=date_10_days_ago).select_related(
         'coordinate')
 
 
@@ -41,7 +43,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     json_geo = json.dumps(criter)
     params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
-    response = requests.post(API_URL, params=params_dict, headers={"User_Agent" : generate_user_agent()})
+    response = requests.post(API_URL, params=params_dict, headers={"User_Agent": generate_user_agent()})
     print(response.json())
     time.sleep(20)
     if response.json().get("error"):

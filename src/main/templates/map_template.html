@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <title>Title</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+    <script
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA073ajNFNsCVAs0oqzkdhRlx8KgAultYI&callback=initMap&libraries=&v=weekly"
+            async
+    ></script>
+    <script>
+        let map;
+        let points = [];
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: {lat: 55.7515372367158, lng: 37.61339942946223},
+                zoom: 8,
+            });
+        }
+
+        function get_points() {
+            interest = document.getElementById("interest").value;
+            $.ajax({
+                type: "GET",
+                contentType: "application/json",
+                url: "/points",
+                data: {
+                    "interest": interest
+                },
+                success: function (response) {
+                    points.forEach((marker) => {
+                        marker.setMap(null);
+                    });
+                    points = []
+                    result = JSON.parse(response.instances);
+                    for (var i = 0; i < result.length; i++) {
+                        const marker = new google.maps.Marker({
+                            position: {
+                                lat: parseInt(result[i].fields.coordinate[1]),
+                                lng: parseInt(result[i].fields.coordinate[0])
+                            },
+                            map: map,
+                        });
+
+                        const infoWindow = new google.maps.InfoWindow({
+                            content: "<p> Кол-во человек " + result[i].fields.count_of_person + " </p>",
+                        });
+
+                        marker.addListener("click", () => {
+                            infoWindow.open({
+                                anchor: marker,
+                                map,
+                                shouldFocus: false,
+                            });
+                        });
+
+                        points.push(marker);
+                    }
+                }
+            });
+        }
+
+        function begin() {
+            initMap();
+            get_points();
+        }
+
+        window.onload = begin;
+    </script>
+    <style>
+        #map {
+            height: 500px;
+            width: 100% ;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <select id="interest">
+        <option>IT услуги</option>
+        <option>Авто и мото</option>
+        <option>Автовладельцы</option>
+    </select>
+    <button type="button" onclick="get_points()">Применить.</button>
+</div>
+
+<div id="map">
+
+</div>
+
+</body>
+</html>
