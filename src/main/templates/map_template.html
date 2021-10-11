@@ -11,21 +11,19 @@
     ></script>{% endcomment %}
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript">
     </script>
+    <script src="https://yastatic.net/s3/mapsapi-jslibs/heatmap/0.0.1/heatmap.min.js" type="text/javascript"></script>
     <script>
 
         let map;
         let points = [];
         let circles = [];
+        let heatMap;
 
         function initMap() {
             map = new ymaps.Map("map", {
                 center: [55.7515372367158, 37.61339942946223],
                 zoom: 8
             });
-            {% comment %}map = new google.maps.Map(document.getElementById("map"), {
-                center: {lat: 55.7515372367158, lng: 37.61339942946223},
-                zoom: 8,
-            });{% endcomment %}
         }
 
         function getColor(count) {
@@ -38,6 +36,7 @@
 
         function get_points() {
             interest = document.getElementById("interest").value;
+            console.log(heatMap)
             $.ajax({
                 type: "GET",
                 contentType: "application/json",
@@ -46,47 +45,29 @@
                     "interest": interest
                 },
                 success: function (response) {
-                    points.forEach((marker) => {
-                        map.geoObjects.remove(marker);
-                    });
-                    circles.forEach((circle) => {
-                        map.geoObjects.remove(circle);
-                    });
                     points = [];
                     circles = [];
                     result = JSON.parse(response.instances);
                     for (var i = 0; i < result.length; i++) {
-                        let marker = new ymaps.Placemark(
-                            [parseFloat(result[i].fields.coordinate[1]), parseFloat(result[i].fields.coordinate[0])],
-                            {
-                                data: [
-                                    {weight: parseInt(result[i].fields.count_of_person), color: "#FFA002"}
-                                ]
+                        points.push({
+                            id: "id" + i,
+                            type: "Feature",
+                            geometry: {
+                                type: 'Point',
+                                coordinates: [parseFloat(result[i].fields.coordinate[1]), parseFloat(result[i].fields.coordinate[0])]
                             },
-                            {
-                                iconLayout: 'default#pieChart',
-                                iconPieChartRadius: 20
-                            }
-                        );
-
-                        let circle = new ymaps.Circle({
-                                type: "Circle",
-                                coordinates: [parseFloat(result[i].fields.coordinate[1]), parseFloat(result[i].fields.coordinate[0])],
-                                radius: 500,
-
-                            },
-                            {},
-                            {
-                                fillColor: getColor(parseInt(result[i].fields.count_of_person)),
-                                fillOpacity: 0.3
-                            }
-                        );
-
-                        map.geoObjects.add(circle);
-                        map.geoObjects.add(marker);
-                        points.push(marker);
-                        circles.push(circle);
+                            properties: {weight: parseInt(result[i].fields.count_of_person)}
+                        });
                     }
+                    ymaps.modules.require(['Heatmap'], function (Heatmap) {
+                        console.log(points);
+                        var data = {
+                            type:"FeatureCollection",
+                            features: points,
+                        },
+                            heatMap = new Heatmap(data);
+                        heatMap.setMap(map);
+                    });
                 }
             });
         }
