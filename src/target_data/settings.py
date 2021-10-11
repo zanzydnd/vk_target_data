@@ -131,7 +131,7 @@ CELERY_BROKER_URL = REDIS_CONNECTION
 CELERY_BEAT_SCHEDULE = {
     "get_data_vk_api": {
         "task": "main.tasks.get_data_vk_api",
-        "schedule": crontab(minute="15", hour="9", day_of_month="*/1"),
+        "schedule": crontab(minute="0", hour="22", day_of_month="*/1"),
         "args": (),
     },
 }
