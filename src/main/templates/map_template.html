@@ -5,19 +5,35 @@
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
-    <script
+    {% comment %}<script
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA073ajNFNsCVAs0oqzkdhRlx8KgAultYI&callback=initMap&libraries=&v=weekly"
             async
-    ></script>
+    ></script>{% endcomment %}
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript">
+    </script>
     <script>
+
         let map;
         let points = [];
+        let circles = [];
 
         function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
+            map = new ymaps.Map("map", {
+                center: [55.7515372367158, 37.61339942946223],
+                zoom: 8
+            });
+            {% comment %}map = new google.maps.Map(document.getElementById("map"), {
                 center: {lat: 55.7515372367158, lng: 37.61339942946223},
                 zoom: 8,
-            });
+            });{% endcomment %}
+        }
+
+        function getColor(count) {
+            if (count < 500) {
+                return "#ffff00"
+            } else if (count < 1000) {
+                return "#ffa500"
+            } else return "#ff0000"
         }
 
         function get_points() {
@@ -31,32 +47,45 @@
                 },
                 success: function (response) {
                     points.forEach((marker) => {
-                        marker.setMap(null);
+                        map.geoObjects.remove(marker);
                     });
-                    points = []
+                    circles.forEach((circle) => {
+                        map.geoObjects.remove(circle);
+                    });
+                    points = [];
+                    circles = [];
                     result = JSON.parse(response.instances);
                     for (var i = 0; i < result.length; i++) {
-                        const marker = new google.maps.Marker({
-                            position: {
-                                lat: parseInt(result[i].fields.coordinate[1]),
-                                lng: parseInt(result[i].fields.coordinate[0])
+                        let marker = new ymaps.Placemark(
+                            [parseFloat(result[i].fields.coordinate[1]), parseFloat(result[i].fields.coordinate[0])],
+                            {
+                                data: [
+                                    {weight: parseInt(result[i].fields.count_of_person), color: "#FFA002"}
+                                ]
                             },
-                            map: map,
-                        });
+                            {
+                                iconLayout: 'default#pieChart',
+                                iconPieChartRadius: 20
+                            }
+                        );
 
-                        const infoWindow = new google.maps.InfoWindow({
-                            content: "<p> Кол-во человек " + result[i].fields.count_of_person + " </p>",
-                        });
+                        let circle = new ymaps.Circle({
+                                type: "Circle",
+                                coordinates: [parseFloat(result[i].fields.coordinate[1]), parseFloat(result[i].fields.coordinate[0])],
+                                radius: 500,
 
-                        marker.addListener("click", () => {
-                            infoWindow.open({
-                                anchor: marker,
-                                map,
-                                shouldFocus: false,
-                            });
-                        });
+                            },
+                            {},
+                            {
+                                fillColor: getColor(parseInt(result[i].fields.count_of_person)),
+                                fillOpacity: 0.3
+                            }
+                        );
 
+                        map.geoObjects.add(circle);
+                        map.geoObjects.add(marker);
                         points.push(marker);
+                        circles.push(circle);
                     }
                 }
             });
@@ -67,12 +96,12 @@
             get_points();
         }
 
-        window.onload = begin;
+        ymaps.ready(begin);
     </script>
     <style>
         #map {
-            height: 500px;
-            width: 100% ;
+            height: 1000px;
+            width: 100%;
         }
     </style>
 </head>

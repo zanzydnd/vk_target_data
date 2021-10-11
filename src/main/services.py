@@ -8,7 +8,7 @@ from user_agent import generate_user_agent
 
 from main.exceptions import TooManyRequestsError
 from main.models import Result, InterestCategory, Coord
-from main.models.in_house import ApiKey
+from main.models.in_house import ApiKey, Pairs
 
 
 def get_points_by_interest_name_service(interest_name: str):
@@ -60,4 +60,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
         entity.coordinate = point
         entity.link = API_URL
         entity.count_of_person = response_data['audience_count']
+        pair = Pairs.objects.get(point=point, interest=interest)
+        pair.last_executions = timezone.now()
+        pair.save()
         entity.save()
