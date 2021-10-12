@@ -17,7 +17,8 @@
         let map;
         let points = [];
         let circles = [];
-        //let heatMap;
+
+        let heatMap;
 
         function initMap() {
             map = new ymaps.Map("map", {
@@ -36,7 +37,7 @@
 
         function get_points() {
             interest = document.getElementById("interest").value;
-            console.log(heatMap)
+            //console.log(heatMap)
             $.ajax({
                 type: "GET",
                 contentType: "application/json",
@@ -61,11 +62,16 @@
                     }
                     ymaps.modules.require(['Heatmap'], function (Heatmap) {
                         console.log(points);
+                        if (heatMap === undefined) {
+                        } else {
+                            heatMap.setMap(null);
+                        }
                         var data = {
-                            type:"FeatureCollection",
+                            type: "FeatureCollection",
                             features: points,
-                        },
-                            heatMap = new Heatmap(data);
+                        };
+                        heatMap = new Heatmap();
+                        heatMap.setData(data);
                         heatMap.setMap(map);
                     });
                 }
