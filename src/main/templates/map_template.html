@@ -71,6 +71,7 @@
                             features: points,
                         };
                         heatMap = new Heatmap();
+                        heatMap.options.set('radius', 15);
                         heatMap.setData(data);
                         heatMap.setMap(map);
                     });

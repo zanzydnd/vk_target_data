@@ -1,6 +1,19 @@
 version: '3'
 
 services:
+  nginx:
+    build:
+      context: .
+      dockerfile: deploy/nginx/Dockerfile
+    ports:
+      - 80:80
+    restart: always
+    depends_on:
+      - app
+    volumes:
+      - static:/app/static
+
+
   app: &app
     build:
       dockerfile: deploy/python/Dockerfile
