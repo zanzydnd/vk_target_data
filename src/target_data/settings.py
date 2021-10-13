@@ -125,7 +125,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = 'static'
 REDIS_CONNECTION = os.environ.get("REDIS_CONNECTION", "redis://redis:6379")
 CELERY_BROKER_URL = REDIS_CONNECTION
 CELERY_BEAT_SCHEDULE = {
