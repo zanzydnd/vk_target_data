@@ -45,6 +45,9 @@
                 data: {
                     "interest": interest
                 },
+                before: function (){
+                    console.log(123);
+                },
                 success: function (response) {
                     points = [];
                     circles = [];
@@ -71,7 +74,7 @@
                             features: points,
                         };
                         heatMap = new Heatmap();
-                        heatMap.options.set('radius', 15);
+                        heatMap.options.set('radius', 500);
                         heatMap.setData(data);
                         heatMap.setMap(map);
                     });
@@ -81,6 +84,7 @@
 
         function begin() {
             initMap();
+            console.log(312);
             get_points();
         }
 

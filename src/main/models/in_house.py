@@ -9,6 +9,7 @@ class ApiKey(models.Model):
     key = models.CharField(max_length=10000)
     expired = models.BooleanField(default=False)
     acc_id = models.CharField(max_length=255, default=os.environ.get("DEF_ACC_ID"))
+    is_taken = models.BooleanField(default=False)
 
     class Meta:
         db_table = "api_keys"
