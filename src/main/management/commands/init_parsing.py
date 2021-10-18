@@ -10,6 +10,14 @@ from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
-    date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
-    for pair in Pairs.objects.filter(Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago)):
-        make_request_to_api(pair.interest, pair.point, try_num=1, err_cnt=0)
+    flag = True
+    while flag:
+        date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
+        try:
+            pair = Pairs.objects.filter(Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))[0]
+        except Exception:
+            flag = False
+        if not pair:
+            flag = False
+        else:
+            make_request_to_api(pair.interest, pair.point, try_num=1, err_cnt=0)

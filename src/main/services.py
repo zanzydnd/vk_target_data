@@ -55,7 +55,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
     response = requests.post(API_URL, params=params_dict, headers={"User_Agent": generate_user_agent()})
-    # print(response.json())
+    print(response.json())
     time.sleep(20)
     if response.json().get("error"):
         if response.json().get("error_code") == 601:
