@@ -25,3 +25,12 @@ class Pairs(models.Model):
     class Meta:
         db_table = "pairs"
         unique_together = ['interest', 'point']
+
+
+#class BatchesForPairs(models.Model):
+#    from_ = models.IntegerField(default=0)
+#    to_ = models.IntegerField()
+#    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE)
+#
+#    class Meta:
+#        db_table = "batch"
