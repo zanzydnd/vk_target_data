@@ -1,7 +1,13 @@
+
+import django
+
+django.setup()
+
 import asyncio
 import datetime
 import json
 import time
+import multiprocessing
 
 import aiohttp
 import requests
@@ -58,6 +64,7 @@ def make_request_to_api(interest: InterestCategory, point: Coord, try_num: int, 
     params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                    "link_domain": LINK_DOMAIN, "criteria": json_geo}
     response = requests.post(API_URL, params=params_dict, headers={"User_Agent": generate_user_agent()})
+
     print(response.json())
     time.sleep(20)
     if response.json().get("error"):
@@ -107,8 +114,13 @@ async def parser(token, pairs):
         async with aiohttp.ClientSession() as session:
             async with session.post(API_URL, params=params_dict) as response:
                 response_json = await response.json()
+                try:
+                    print(multiprocessing.current_process())
+                except Exception:
+                    pass
+                print(token.key)
                 print(response_json)
-                await asyncio.sleep(5)
+                await asyncio.sleep(10)
                 if response_json.get('error'):
                     if response_json.get('error_code') == 601:
                         token.is_taken = False
@@ -130,6 +142,10 @@ async def parser(token, pairs):
                     entity.save()
 
 
+def bridge_to_async(corteg):
+    asyncio.get_event_loop().run_until_complete(parser(corteg[0],corteg[1]))
+
+
 async def async_request_to_api():
     num_tokens = ApiKey.objects.filter(expired=False).count()
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
@@ -144,3 +160,18 @@ async def async_request_to_api():
         data.append((pairs[i * butch_size: i * butch_size + butch_size], api_key))
         i += 1
     result = await asyncio.gather(*[parser(j[1], j[0]) for j in data])
+
+def butch_before_procs():
+    num_tokens = ApiKey.objects.filter(expired=False).count()
+    date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
+    num_points_to_check = Pairs.objects.filter(
+        Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago)).count()
+    butch_size = int(num_points_to_check / num_tokens + 0.5)
+    data = []
+    i = 0
+    pairs = Pairs.objects.filter(
+        Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
+    for api_key in ApiKey.objects.filter(expired=False):
+        data.append((api_key, pairs[i * butch_size: i * butch_size + butch_size]))
+        i += 1
+    return data
