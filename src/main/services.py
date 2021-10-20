@@ -108,7 +108,7 @@ async def parser(token, pairs):
             async with session.post(API_URL, params=params_dict) as response:
                 response_json = await response.json()
                 print(response_json)
-                await asyncio.sleep(20)
+                await asyncio.sleep(5)
                 if response_json.get('error'):
                     if response_json.get('error_code') == 601:
                         token.is_taken = False
@@ -131,7 +131,7 @@ async def parser(token, pairs):
 
 
 async def async_request_to_api():
-    num_tokens = ApiKey.objects.filter(expired=False, is_taken=False).count()
+    num_tokens = ApiKey.objects.filter(expired=False).count()
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
     num_points_to_check = Pairs.objects.filter(
         Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago)).count()
@@ -140,7 +140,7 @@ async def async_request_to_api():
     i = 0
     pairs = Pairs.objects.filter(
         Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
-    for api_key in ApiKey.objects.filter(expired=False, is_taken=False):
+    for api_key in ApiKey.objects.filter(expired=False):
         data.append((pairs[i * butch_size: i * butch_size + butch_size], api_key))
         i += 1
     result = await asyncio.gather(*[parser(j[1], j[0]) for j in data])
