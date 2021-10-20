@@ -120,7 +120,7 @@ async def parser(token, pairs):
                     pass
                 print(token.key)
                 print(response_json)
-                await asyncio.sleep(10)
+                await asyncio.sleep(5)
                 if response_json.get('error'):
                     if response_json.get('error_code') == 601:
                         token.is_taken = False
