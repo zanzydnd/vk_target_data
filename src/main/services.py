@@ -1,4 +1,3 @@
-
 import django
 
 django.setup()
@@ -143,7 +142,7 @@ async def parser(token, pairs):
 
 
 def bridge_to_async(corteg):
-    asyncio.get_event_loop().run_until_complete(parser(corteg[0],corteg[1]))
+    asyncio.get_event_loop().run_until_complete(parser(corteg[0], corteg[1]))
 
 
 async def async_request_to_api():
@@ -160,6 +159,7 @@ async def async_request_to_api():
         data.append((pairs[i * butch_size: i * butch_size + butch_size], api_key))
         i += 1
     result = await asyncio.gather(*[parser(j[1], j[0]) for j in data])
+
 
 def butch_before_procs():
     num_tokens = ApiKey.objects.filter(expired=False).count()
