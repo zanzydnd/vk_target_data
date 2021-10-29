@@ -27,10 +27,14 @@ class Pairs(models.Model):
         unique_together = ['interest', 'point']
 
 
-class PairsWithSexAndAge(Pairs):
+class PairsWithSexAndAge(models.Model):
     is_male = models.BooleanField(null=True)
     age_begin = models.IntegerField(null=True)
     age_end = models.IntegerField(null=True)
+    interest = models.ForeignKey(InterestCategory, on_delete=models.CASCADE)
+    point = models.ForeignKey(Coord, on_delete=models.CASCADE)
+    last_executions = models.DateTimeField(null=True)
 
     class Meta:
         db_table = "pairs_with_info"
+        unique_together = ['interest', 'point', 'age_begin', 'age_end', 'is_male']
