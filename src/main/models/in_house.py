@@ -27,10 +27,10 @@ class Pairs(models.Model):
         unique_together = ['interest', 'point']
 
 
-#class BatchesForPairs(models.Model):
-#    from_ = models.IntegerField(default=0)
-#    to_ = models.IntegerField()
-#    api_key = models.ForeignKey(ApiKey, on_delete=models.CASCADE)
-#
-#    class Meta:
-#        db_table = "batch"
+class PairsWithSexAndAge(Pairs):
+    is_male = models.BooleanField(null=True)
+    age_begin = models.IntegerField(null=True)
+    age_end = models.IntegerField(null=True)
+
+    class Meta:
+        db_table = "pairs_with_info"

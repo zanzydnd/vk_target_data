@@ -35,6 +35,10 @@ class Result(models.Model):
     begin_date = models.DateTimeField()
     end_date = models.DateTimeField(auto_now=True)
 
+    is_male = models.BooleanField(null=True)
+    age_begin = models.IntegerField(null=True)
+    age_end = models.IntegerField(null=True)
+
     class Meta:
         db_table = "result"
         verbose_name = "Результат"
