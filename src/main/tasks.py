@@ -5,7 +5,6 @@ from django.db.models import Q
 from django.utils import timezone
 
 from main.models.in_house import Pairs
-from main.services import make_request_to_api
 from target_data.celery import app
 
 logger = logging.getLogger(__name__)
@@ -23,6 +22,7 @@ def get_data_vk_api():
         if not pair:
             flag = False
         else:
-            make_request_to_api(pair.interest, pair.point, try_num=1, err_cnt=0)
+            pass
+            #make_request_to_api(pair.interest, pair.point, try_num=1, err_cnt=0)
     # for pair in Pairs.objects.filter(Q(last_executions=None)|Q(last_executions__lte=date_10_days_ago)):
     #    make_request_to_api(pair.interest, pair.point, try_num=1, err_cnt=0)

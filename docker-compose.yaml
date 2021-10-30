@@ -13,8 +13,7 @@ services:
     volumes:
       - static:/app/static
 
-
-  app: &app
+  app:
     build:
       dockerfile: deploy/python/Dockerfile
       context: .
@@ -29,24 +28,6 @@ services:
       PYTHONBUFFERED: 1
     volumes:
       - static:/app/static
-
-  celery:
-    <<: *app
-    working_dir: /app/src
-    command: celery -A target_data worker -l debug
-    ports: [ ]
-    volumes: [ ]
-
-
-
-  celery-beat:
-    <<: *app
-    working_dir: /app/src
-    depends_on:
-      - celery
-    command: celery -A target_data beat -l debug
-    ports: [ ]
-    volumes: [ ]
 
   redis:
     image: redis:6-alpine
