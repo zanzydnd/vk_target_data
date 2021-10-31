@@ -48,8 +48,8 @@
                 data: {
                     "interest": interest
                 },
-                before: function () {
-                    document.getElementById("loader").hidden = false;
+                beforeSend: function () {
+                    $('#loader').show();
                 },
                 success: function (response) {
                     points = [];
@@ -77,13 +77,12 @@
                             features: points,
                         };
                         heatMap = new Heatmap();
-                        heatMap.options.set('radius', 500);
                         heatMap.setData(data);
                         heatMap.setMap(map);
                     });
                 },
-                after: function (){
-                    document.getElementById("loader").hidden = true;
+                complete: function (){
+                    $('#loader').hide();
                 }
             });
         }
@@ -130,8 +129,7 @@
         {% endfor %}
     </select>
     <button type="button" onclick="get_points()">Применить.</button>
-    <div class="loader">
-
+    <div class="loader" id="loader">
     </div>
 </div>
 
