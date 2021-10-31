@@ -167,7 +167,7 @@ def butch_before_procs():
 
 
 def butch_before_procs_info():
-    num_tokens = ApiKey.objects.filter(expired=False).count()
+    num_tokens = 30 #ApiKey.objects.filter(expired=False).count()
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
     num_points_to_check = PairsWithSexAndAge.objects.filter(
         Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago)).count()
@@ -176,7 +176,7 @@ def butch_before_procs_info():
     i = 0
     pairs = PairsWithSexAndAge.objects.filter(
         Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
-    for api_key in ApiKey.objects.filter(expired=False):
+    for api_key in ApiKey.objects.filter(expired=False)[:31]:
         data.append((api_key, pairs[i * butch_size: i * butch_size + butch_size]))
         i += 1
     return data
