@@ -83,63 +83,68 @@ async def parser(token, pairs):
                     entity.save()
 
 
-async def parser_info(token, pairs):
-    result = []
-    for pair in pairs:
-        point = pair.point
-        interest = pair.interest
-        token.is_taken = True
-        token.save()
-        results_qs = Result.objects.filter(coordinate=point, interest=interest).order_by("-end_date")
-        if results_qs and (timezone.now() - results_qs[0].end_date).days < 10:
-            return
-        entity = Result(begin_date=timezone.now())
-        sex = 1
-        if pair.is_male:
-            sex = 2
-        criter = {
-            "interest_categories": interest.interes_name,
-            "geo_near": f"{point.y},{point.x},500",
-            "sex": sex,
-            "age_from": pair.age_begin,
-            "age_to": pair.age_end
-        }
-        # latitude - широта - y
-        # longitude - долгота - x
-        json_geo = json.dumps(criter)
-        params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
-                       "link_domain": LINK_DOMAIN, "criteria": json_geo}
-        async with aiohttp.ClientSession() as session:
-            async with session.post(API_URL, params=params_dict) as response:
-                response_json = await response.json()
-                try:
-                    print(multiprocessing.current_process())
-                except Exception:
-                    pass
-                print(token.key)
-                print(response_json)
-                await asyncio.sleep(5)
-                if response_json.get('error'):
-                    if response_json.get('error_code') == 601:
-                        token.is_taken = False
-                        token.expired = True
-                        token.save()
+async def parser_info(token, pairs_limit):
+    i = pairs_limit[0]
+    date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
+    while i <= pairs_limit:
+        pairs = PairsWithSexAndAge.objects.filter(
+            Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
+        for pair in pairs:
+            point = pair.point
+            interest = pair.interest
+            token.is_taken = True
+            token.save()
+            results_qs = Result.objects.filter(coordinate=point, interest=interest).order_by("-end_date")
+            if results_qs and (timezone.now() - results_qs[0].end_date).days < 10:
+                return
+            entity = Result(begin_date=timezone.now())
+            sex = 1
+            if pair.is_male:
+                sex = 2
+            criter = {
+                "interest_categories": interest.interes_name,
+                "geo_near": f"{point.y},{point.x},500",
+                "sex": sex,
+                "age_from": pair.age_begin,
+                "age_to": pair.age_end
+            }
+            # latitude - широта - y
+            # longitude - долгота - x
+            json_geo = json.dumps(criter)
+            params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
+                           "link_domain": LINK_DOMAIN, "criteria": json_geo}
+            async with aiohttp.ClientSession() as session:
+                async with session.post(API_URL, params=params_dict) as response:
+                    response_json = await response.json()
+                    try:
+                        print(multiprocessing.current_process())
+                    except Exception:
+                        pass
+                    print(token.key)
+                    print(response_json)
+                    await asyncio.sleep(5)
+                    if response_json.get('error'):
+                        if response_json.get('error_code') == 601:
+                            token.is_taken = False
+                            token.expired = True
+                            token.save()
+                        else:
+                            continue
                     else:
-                        continue
-                else:
-                    response_data = response_json.get('response')
-                    entity.interest = interest
-                    entity.coordinate = point
-                    entity.link = API_URL
-                    entity.is_male = pair.is_male
-                    entity.age_begin = pair.age_begin
-                    entity.age_end = pair.age_end
-                    entity.count_of_person = response_data.get('audience_count')
-                    pair.last_executions = timezone.now()
-                    token.is_taken = False
-                    token.save()
-                    pair.save()
-                    entity.save()
+                        response_data = response_json.get('response')
+                        entity.interest = interest
+                        entity.coordinate = point
+                        entity.link = API_URL
+                        entity.is_male = pair.is_male
+                        entity.age_begin = pair.age_begin
+                        entity.age_end = pair.age_end
+                        entity.count_of_person = response_data.get('audience_count')
+                        pair.last_executions = timezone.now()
+                        token.is_taken = False
+                        token.save()
+                        pair.save()
+                        entity.save()
+        i += 1000
 
 
 def bridge_to_async(corteg):
@@ -167,16 +172,16 @@ def butch_before_procs():
 
 
 def butch_before_procs_info():
-    num_tokens = 30 #ApiKey.objects.filter(expired=False).count()
+    num_tokens = ApiKey.objects.filter(expired=False).count()
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
     num_points_to_check = PairsWithSexAndAge.objects.filter(
         Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago)).count()
     butch_size = int(num_points_to_check / num_tokens + 0.5)
     data = []
     i = 0
-    pairs = PairsWithSexAndAge.objects.filter(
-        Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
-    for api_key in ApiKey.objects.filter(expired=False)[:31]:
-        data.append((api_key, pairs[i * butch_size: i * butch_size + butch_size]))
+    # pairs = PairsWithSexAndAge.objects.filter(
+    #    Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))
+    for api_key in ApiKey.objects.filter(expired=False):
+        data.append((api_key, (i * butch_size, i * butch_size + butch_size)))
         i += 1
     return data
