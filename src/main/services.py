@@ -95,7 +95,6 @@ async def parser_info(token, pairs_limit):
             interest = pair.interest
             token.is_taken = True
             token.save()
-            print(interest.interes_name)
             results_qs = Result.objects.filter(coordinate=point, interest=interest, is_male=pair.is_male,
                                                age_begin=pair.age_begin, age_end=pair.age_end).order_by("-end_date")
             if results_qs and (timezone.now() - results_qs[0].end_date).days < 10:
@@ -104,6 +103,7 @@ async def parser_info(token, pairs_limit):
             sex = 1
             if pair.is_male:
                 sex = 2
+            print(str(interest.interes_name))
             criter = {
                 "interest_categories": interest.interes_name,
                 "geo_near": f"{point.y},{point.x},500",
