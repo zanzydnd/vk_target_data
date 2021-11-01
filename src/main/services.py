@@ -132,19 +132,22 @@ async def parser_info(token, pairs_limit):
                         else:
                             continue
                     else:
-                        response_data = response_json.get('response')
-                        entity.interest = interest
-                        entity.coordinate = point
-                        entity.link = API_URL
-                        entity.is_male = pair.is_male
-                        entity.age_begin = pair.age_begin
-                        entity.age_end = pair.age_end
-                        entity.count_of_person = response_data.get('audience_count')
-                        pair.last_executions = timezone.now()
-                        token.is_taken = False
-                        token.save()
-                        pair.save()
-                        entity.save()
+                        try:
+                            response_data = response_json.get('response')
+                            entity.interest = interest
+                            entity.coordinate = point
+                            entity.link = API_URL
+                            entity.is_male = pair.is_male
+                            entity.age_begin = pair.age_begin
+                            entity.age_end = pair.age_end
+                            entity.count_of_person = response_data.get('audience_count')
+                            pair.last_executions = timezone.now()
+                            token.is_taken = False
+                            token.save()
+                            pair.save()
+                            entity.save()
+                        except Exception as e:
+                            pass
         i += 1000
 
 
