@@ -6,8 +6,8 @@ from main.models import InterestCategory, Coord, PairsWithSexAndAge
 class Command(BaseCommand):
     def handle(self, *args, **options):
         data = []
-        AGES = [(0, 18), (18, 21), (21, 24),
-                (24, 27), (27, 30), (30, 35), (35, 45), (45, 54), (54, 64), (65, 100)]
+        AGES = [(14, 18), (18, 21), (21, 24),
+                (24, 27), (27, 30), (30, 35), (35, 45), (45, 54), (54, 65), (65, 80)]
         for interest in InterestCategory.objects.all():
             for coord in Coord.objects.all():
                 for age in AGES:
