@@ -95,14 +95,15 @@ async def parser_info(token, pairs_limit):
             interest = pair.interest
             token.is_taken = True
             token.save()
-            results_qs = Result.objects.filter(coordinate=point, interest=interest).order_by("-end_date")
+            print(interest.interes_name)
+            results_qs = Result.objects.filter(coordinate=point, interest=interest, is_male=pair.is_male,
+                                               age_begin=pair.age_begin, age_end=pair.age_end).order_by("-end_date")
             if results_qs and (timezone.now() - results_qs[0].end_date).days < 10:
-                return
+                continue
             entity = Result(begin_date=timezone.now())
             sex = 1
             if pair.is_male:
                 sex = 2
-            print(321)
             criter = {
                 "interest_categories": interest.interes_name,
                 "geo_near": f"{point.y},{point.x},500",
@@ -110,7 +111,6 @@ async def parser_info(token, pairs_limit):
                 "age_from": pair.age_begin,
                 "age_to": pair.age_end
             }
-            print(123)
             # latitude - широта - y
             # longitude - долгота - x
             json_geo = json.dumps(criter)
@@ -118,10 +118,7 @@ async def parser_info(token, pairs_limit):
                            "link_domain": LINK_DOMAIN, "criteria": json_geo}
             async with aiohttp.ClientSession() as session:
                 async with session.post(API_URL, params=params_dict) as response:
-                    try:
-                        response_json = await response.json()
-                    except Exception as e:
-                        print(3333333)
+                    response_json = await response.json()
                     try:
                         print(multiprocessing.current_process())
                     except Exception:
