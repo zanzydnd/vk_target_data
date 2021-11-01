@@ -118,7 +118,10 @@ async def parser_info(token, pairs_limit):
                            "link_domain": LINK_DOMAIN, "criteria": json_geo}
             async with aiohttp.ClientSession() as session:
                 async with session.post(API_URL, params=params_dict) as response:
-                    response_json = await response.json()
+                    try:
+                        response_json = await response.json()
+                    except Exception as e:
+                        print(3333333)
                     try:
                         print(multiprocessing.current_process())
                     except Exception:
