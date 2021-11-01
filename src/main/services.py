@@ -87,7 +87,6 @@ async def parser_info(token, pairs_limit):
     i = pairs_limit[0] + 1000
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
     while i <= pairs_limit[1]:
-        print(i)
         pairs = PairsWithSexAndAge.objects.filter(
             Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))[i - 1000:i]
         for pair in pairs:
@@ -102,6 +101,7 @@ async def parser_info(token, pairs_limit):
             sex = 1
             if pair.is_male:
                 sex = 2
+            print(321)
             criter = {
                 "interest_categories": interest.interes_name,
                 "geo_near": f"{point.y},{point.x},500",
@@ -109,6 +109,7 @@ async def parser_info(token, pairs_limit):
                 "age_from": pair.age_begin,
                 "age_to": pair.age_end
             }
+            print(123)
             # latitude - широта - y
             # longitude - долгота - x
             json_geo = json.dumps(criter)
@@ -140,7 +141,7 @@ async def parser_info(token, pairs_limit):
                             entity.is_male = pair.is_male
                             entity.age_begin = pair.age_begin
                             entity.age_end = pair.age_end
-                            entity.count_of_person = response_data.get('audience_count')
+                            entity.count_of_person = int(response_data.get('audience_count'))
                             pair.last_executions = timezone.now()
                             token.is_taken = False
                             token.save()
