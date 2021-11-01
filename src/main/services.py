@@ -87,6 +87,7 @@ async def parser_info(token, pairs_limit):
     i = pairs_limit[0] + 1000
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
     while i <= pairs_limit[1]:
+        print(i)
         pairs = PairsWithSexAndAge.objects.filter(
             Q(last_executions=None) | Q(last_executions__lte=date_10_days_ago))[i - 1000:i]
         for pair in pairs:
