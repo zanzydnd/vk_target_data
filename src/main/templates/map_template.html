@@ -37,6 +37,8 @@
 
         function get_points() {
             interest = document.getElementById("interest").value;
+            sex = document.getElementById("sex").value;
+            age = document.getElementById("age").value;
             //new
 
 
@@ -46,7 +48,9 @@
                 contentType: "application/json",
                 url: "/points",
                 data: {
-                    "interest": interest
+                    "interest": interest,
+                    "age": age,
+                    "sex": sex
                 },
                 beforeSend: function () {
                     $('#loader').show();
@@ -81,7 +85,7 @@
                         heatMap.setMap(map);
                     });
                 },
-                complete: function (){
+                complete: function () {
                     $('#loader').hide();
                 }
             });
@@ -123,16 +127,26 @@
 <body>
 
 <div style="display: flex; flex-direction: row;">
-    <select id="interest">
+    <select id="interest" name="interest">
         {% for interest in interests %}
             <option>{{ interest.interes_name }}</option>
         {% endfor %}
+    </select>
+    <select id="age" name="age">
+        <option value="-" selected>-</option>
+        {% for age in ages %}
+            <option value="{{ age.0 }}-{{ age.1 }}">{{ age.0 }}-{{ age.1 }}</option>
+        {% endfor %}
+    </select>
+    <select id="sex" name="sex">
+        <option value="-" selected>-</option>
+        <option value="м">Мужчины</option>
+        <option value="ж">Женщины</option>
     </select>
     <button type="button" onclick="get_points()">Применить.</button>
     <div class="loader" id="loader">
     </div>
 </div>
-
 
 
 <div id="map">

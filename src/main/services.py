@@ -8,14 +8,30 @@ import json
 import multiprocessing
 
 import aiohttp
-import requests
 from django.db.models import Q
 from django.utils import timezone
-from user_agent import generate_user_agent
 
-from main.models import Result
+from main.models import Result, InterestCategory
 from main.models.in_house import ApiKey, Pairs, PairsWithSexAndAge
 
+
+def pick_points(interest_name: str, sex: str, age: str):
+    interest = InterestCategory.objects.get(interes_name=interest_name)
+    raw = "SELECT * FROM result t where end_date = ( select max(t1.end_date) from result t1 where t1.coordinate_id= t.coordinate_id and" \
+          " interest_id=" + str(interest.id)
+    if sex != "-":
+        if sex == "м":
+            raw += " and is_male=1"
+        else:
+            raw += " and is_male=0"
+    if age != "-":
+        from_, to_ = age.split("-")
+        raw += f" and age_from={from_} and age_to={to_}"
+
+    raw += ");"
+    print(raw)
+    #return Result.objects.raw(raw)
+    return Result.objects.filter(interest__interes_name=interest_name).order_by('-end_date')[:10000]
 
 def get_points_by_interest_name_service(interest_name: str):
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
@@ -51,7 +67,7 @@ async def parser(token, pairs):
         json_geo = json.dumps(criter)
         params_dict = {"account_id": token.acc_id, "access_token": token.key, "v": "5.131", "link_url": API_URL,
                        "link_domain": LINK_DOMAIN, "criteria": json_geo}
-        response = requests.post(API_URL, params=params_dict, headers={"User_Agent": generate_user_agent()})
+        # response = requests.post(API_URL, params=params_dict, headers={"User_Agent": generate_user_agent()})
         async with aiohttp.ClientSession() as session:
             async with session.post(API_URL, params=params_dict) as response:
                 response_json = await response.json()
@@ -192,3 +208,8 @@ def butch_before_procs_info():
         data.append((api_key, (i * butch_size, i * butch_size + butch_size)))
         i += 1
     return data
+
+
+def to_cache():
+    pass
+    #for combin in PairsWithSexAndAge

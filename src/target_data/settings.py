@@ -53,6 +53,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.environ.get("CACHE", "C:/Users/Danya/vk_api_target_cache/"),
+        'TIMEOUT' : None
+    }
+}
+
 ROOT_URLCONF = 'target_data.urls'
 
 TEMPLATES = [
