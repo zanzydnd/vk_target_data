@@ -10,28 +10,45 @@ import multiprocessing
 import aiohttp
 from django.db.models import Q
 from django.utils import timezone
-
-from main.models import Result, InterestCategory
+from main.models import Result, InterestCategory, Coord
 from main.models.in_house import ApiKey, Pairs, PairsWithSexAndAge
+from django.db.models import Sum
 
 
 def pick_points(interest_name: str, sex: str, age: str):
-    interest = InterestCategory.objects.get(interes_name=interest_name)
-    raw = "SELECT * FROM result t where end_date = ( select max(t1.end_date) from result t1 where t1.coordinate_id= t.coordinate_id and" \
-          " interest_id=" + str(interest.id)
-    if sex != "-":
-        if sex == "м":
-            raw += " and is_male=1"
-        else:
-            raw += " and is_male=0"
-    if age != "-":
-        from_, to_ = age.split("-")
-        raw += f" and age_from={from_} and age_to={to_}"
+    interest = InterestCategory.objects.using("cache").get(interes_name=interest_name)
 
-    raw += ");"
-    print(raw)
-    #return Result.objects.raw(raw)
-    return Result.objects.filter(interest__interes_name=interest_name).order_by('-end_date')[:10000]
+    if sex == "-":
+        sex = None
+    elif sex == "м":
+        sex = True
+    else:
+        sex = False
+
+    if age == "-":
+        age = None
+
+    query = Q(interest=interest)
+
+    if sex:
+        query &= Q(is_male=sex)
+    else:
+        query &= Q(is_male__isnull=False)
+
+    if age:
+        from_, to_ = list(map(int, age.split("-")))
+        query &= Q(age_begin=from_, age_end=to_)
+    else:
+        query &= Q(age_begin__isnull=False, age_end__isnull=True)
+
+    points = Result.objects.using("cache").filter(query).values('coordinate') \
+        .annotate(count_of_person=Sum('count_of_person'))
+
+    print(points)
+    print(points[0], points[1])
+
+    return points
+
 
 def get_points_by_interest_name_service(interest_name: str):
     date_10_days_ago = timezone.now() - datetime.timedelta(days=10)
@@ -151,6 +168,10 @@ async def parser_info(token, pairs_limit):
                             continue
                     else:
                         try:
+                            interest_from_chache = InterestCategory.objects.using('cache').get(
+                                interes_name=interest.interes_name)
+                            coordinate_from_cache = Coord.objects.using('cache').get(x=point.x, y=point.y)
+
                             response_data = response_json.get('response')
                             entity.interest = interest
                             entity.coordinate = point
@@ -160,6 +181,27 @@ async def parser_info(token, pairs_limit):
                             entity.age_end = pair.age_end
                             entity.count_of_person = int(response_data.get('audience_count'))
                             pair.last_executions = timezone.now()
+
+                            try:
+                                update_cache = Result.objects.using('cache').get(interest=interest_from_chache,
+                                                                                 coordinate=coordinate_from_cache,
+                                                                                 is_male=pair.is_male,
+                                                                                 age_begin=pair.age_begin,
+                                                                                 age_end=pair.age_end)
+                                update_cache.end_date = timezone.now()
+                                update_cache.count_of_person = int(response_data.get('audience_count'))
+                                update_cache.save(using='cache')
+                            except Exception as e:
+                                entity_to_cache = Result(begin_date=timezone.now())
+                                entity_to_cache.interest = interest_from_chache
+                                entity_to_cache.coordinate = coordinate_from_cache
+                                entity_to_cache.link = API_URL
+                                entity_to_cache.is_male = pair.is_male
+                                entity_to_cache.age_begin = pair.age_begin
+                                entity_to_cache.age_end = pair.age_end
+                                entity_to_cache.count_of_person = int(response_data.get('audience_count'))
+                                entity_to_cache.save(using='cache')
+
                             token.is_taken = False
                             token.save()
                             pair.save()
@@ -212,4 +254,4 @@ def butch_before_procs_info():
 
 def to_cache():
     pass
-    #for combin in PairsWithSexAndAge
+    # for combin in PairsWithSexAndAge

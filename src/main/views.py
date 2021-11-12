@@ -17,6 +17,7 @@ def get_points_json_view(request):
             serialized_instances = serializers.serialize('json', pick_points(
                 request.GET.get("interest"), request.GET.get("sex"), request.GET.get("age")),
                                                          use_natural_foreign_keys=True, use_natural_primary_keys=True)
+            print(serialized_instances)
             return JsonResponse({"instances": serialized_instances}, status=200)
         else:
             return JsonResponse({"error": "No get parameter interest"}, status=400)

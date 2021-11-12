@@ -57,7 +57,7 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
         'LOCATION': os.environ.get("CACHE", "C:/Users/Danya/vk_api_target_cache/"),
-        'TIMEOUT' : None
+        'TIMEOUT': None
     }
 }
 
@@ -95,6 +95,14 @@ DATABASES = {
         'OPTIONS': {
             'charset': 'utf8mb4',
         }
+    },
+    'cache': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'db',
+        'PORT': 5432,
     }
 }
 
