@@ -14,42 +14,77 @@ from main.models import Result, InterestCategory, Coord
 from main.models.in_house import ApiKey, Pairs, PairsWithSexAndAge
 from django.db.models import Sum
 
+queries = {
+    "--": 'SELECT 1 as id,sum(count_of_person) as count_of_person ,coordinate_id '
+          'from "result" where age_begin is not null and age_end is not null '
+          'and is_male is not NULL and count_of_person != 0 and interest_id = %s group by coordinate_id;',
+    "+-": 'SELECT 1 as id,sum(count_of_person) as count_of_person ,coordinate_id '
+          'from "result" where age_begin = %s and age_end = %s '
+          'and is_male is not NULL and count_of_person != 0 and interest_id = %s group by coordinate_id;',
+    "-+": 'SELECT 1 as id,sum(count_of_person) as count_of_person ,coordinate_id '
+          'from "result" where age_begin is not null and age_end is not null '
+          'and is_male = %s and count_of_person != 0 and interest_id = %s group by coordinate_id;',
+    '++': 'SELECT 1 as id,sum(count_of_person) as count_of_person ,coordinate_id '
+          'from "result" where age_begin = %s and age_end = %s '
+          'and is_male = %s and count_of_person != 0 and interest_id = %s group by coordinate_id;'
+}
+
 
 def pick_points(interest_name: str, sex: str, age: str):
-    # interest = InterestCategory.objects.using("cache").get(interes_name=interest_name)
-
-    if sex == "-":
-        sex = None
-    elif sex == "м":
-        sex = True
-    else:
-        sex = False
-
-    if age == "-":
-        age = None
-
-    query = Q(interest__interes_name=interest_name)
-
-    if sex:
-        query &= Q(is_male=sex)
-    else:
-        query &= Q(is_male__isnull=False)
-
-    if age:
+    interest = InterestCategory.objects.using("cache").get(interes_name=interest_name)
+    key = ''
+    append = []
+    if age != "-":
+        key += "+"
         from_, to_ = list(map(int, age.split("-")))
-        query &= Q(age_begin=from_, age_end=to_)
+        append.append(from_)
+        append.append(to_)
     else:
-        query &= Q(age_begin__isnull=False, age_end__isnull=True)
+        key += "-"
 
-    print(Result.objects.using("cache").filter(query).values('coordinate').annotate(
-        count_of_person=Sum('count_of_person')).query)
+    if sex != "-":
+        key += "+"
+        if sex == "м":
+            sex = "TRUE"
+        else:
+            sex = "FALSE"
+        append.append(sex)
+    else:
+        key += "-"
 
-    points = Result.objects.using("cache").filter(query).values('coordinate') \
-        .annotate(count_of_person=Sum('count_of_person'))
+    append.append(interest.id)
 
-    print(points)
+    append = tuple(append)
+    print(append)
+    print(key)
+    query = queries[key] % append
 
-    return points
+    print(query)
+
+    return Result.objects.using('cache').raw(query)
+
+    # query = Q(interest__interes_name=interest_name)
+    #
+    # if sex:
+    #     query &= Q(is_male=sex)
+    # else:
+    #     query &= Q(is_male__isnull=False)
+    #
+    # if age:
+    #     from_, to_ = list(map(int, age.split("-")))
+    #     query &= Q(age_begin=from_, age_end=to_)
+    # else:
+    #     query &= Q(age_begin__isnull=False, age_end__isnull=True)
+    #
+    # print(Result.objects.using("cache").filter(query).values('coordinate').annotate(
+    #     count_of_person=Sum('count_of_person')).query)
+    #
+    # points = Result.objects.using("cache").filter(query).values('coordinate') \
+    #     .annotate(count_of_person=Sum('count_of_person'))
+    #
+    # print(points)
+    #
+    # return points
 
 
 def get_points_by_interest_name_service(interest_name: str):

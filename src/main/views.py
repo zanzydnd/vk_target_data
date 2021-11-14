@@ -26,4 +26,4 @@ def get_points_json_view(request):
 
 
 def get_map_template(request):
-    return render(request, "map_template.html", {"interests": InterestCategory.objects.all(), "ages": AGES})
+    return render(request, "map_template.html", {"interests": InterestCategory.objects.using('cache').all(), "ages": AGES})
