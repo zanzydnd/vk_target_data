@@ -24,18 +24,18 @@ services:
       - redis
       - postgres
     environment:
-      DEBUG: 'True'
-      REDIS_CONNECTION: redis://redis:6379
-      PYTHONBUFFERED: 1
-      CACHE_HOST: 'db'
-      CACHE_USER: 'postgres'
-      CACHE_PASSWORD: 'postgres'
-      CACHE_NAME: 'collect_vk_data'
-      CACHE_PORT: 5432
-      DB_HOST: '109.68.212.119'
-      DB_USER: 'honepaUser2'
-      DB_PASSWORD: 'jkodfgUJ$&*hfgjdn3#7'
-      DB_NAME: 'collect_interes_vk_api'
+      - DEBUG=True
+      - REDIS_CONNECTION=redis://redis:6379
+      - PYTHONBUFFERED=1
+      - CACHE_HOST=db
+      - CACHE_USER=postgres
+      - CACHE_PASSWORD=postgres
+      - CACHE_NAME=collect_vk_data
+      - CACHE_PORT=5432
+      - DB_HOST=109.68.212.119
+      - DB_USER=honepaUser2
+      - DB_PASSWORD=jkodfgUJ$&*hfgjdn3#7
+      - DB_NAME=collect_interes_vk_api
 
 
     volumes:
