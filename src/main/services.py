@@ -168,7 +168,7 @@ async def parser_info(token, pairs_limit):
                     else:
                         try:
                             interest_from_chache = InterestCategory.objects.using('cache').get(
-                                interes_name=interest.interes_name)
+                                id=interest.id)
                             coordinate_from_cache = Coord.objects.using('cache').get(x=point.x, y=point.y)
 
                             response_data = response_json.get('response')
