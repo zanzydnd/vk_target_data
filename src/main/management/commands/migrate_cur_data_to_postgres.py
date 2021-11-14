@@ -49,7 +49,7 @@ async def worker(sizes):
                           age_end=result.age_end, is_male=result.is_male, link=result.link)
 
             save.save(using='cache')
-
+            print('saved')
         del data
         i += 1000
 
