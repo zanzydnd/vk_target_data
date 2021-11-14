@@ -41,7 +41,7 @@ async def worker(sizes):
         data = Result.objects.using('default').filter(is_male__isnull=False, age_begin__isnull=False,
                                                       age_end__isnull=False, count_of_person__gt=0)[i: i + 1000]
         for result in data:
-            interest = InterestCategory.objects.using('cache').get(interes_name=result.interest.interes_name)
+            interest = InterestCategory.objects.using('cache').get(id=result.interest.id)
             coordinate = Coord.objects.using('cache').get(x=result.coordinate.x, y=result.coordinate.y)
 
             save = Result(interest=interest, coordinate=coordinate, count_of_person=result.count_of_person,

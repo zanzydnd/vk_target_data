@@ -192,16 +192,17 @@ async def parser_info(token, pairs_limit):
                                 update_cache.save(using='cache')
                                 print('updated in cache')
                             except Exception as e:
-                                entity_to_cache = Result(begin_date=timezone.now())
-                                entity_to_cache.interest = interest_from_chache
-                                entity_to_cache.coordinate = coordinate_from_cache
-                                entity_to_cache.link = API_URL
-                                entity_to_cache.is_male = pair.is_male
-                                entity_to_cache.age_begin = pair.age_begin
-                                entity_to_cache.age_end = pair.age_end
-                                entity_to_cache.count_of_person = int(response_data.get('audience_count'))
-                                entity_to_cache.save(using='cache')
-                                print(e)
+                                if int(response_data.get('audience_count')) != 0:
+                                    entity_to_cache = Result(begin_date=timezone.now())
+                                    entity_to_cache.interest = interest_from_chache
+                                    entity_to_cache.coordinate = coordinate_from_cache
+                                    entity_to_cache.link = API_URL
+                                    entity_to_cache.is_male = pair.is_male
+                                    entity_to_cache.age_begin = pair.age_begin
+                                    entity_to_cache.age_end = pair.age_end
+                                    entity_to_cache.count_of_person = int(response_data.get('audience_count'))
+                                    entity_to_cache.save(using='cache')
+                                    print('cache created')
                             token.is_taken = False
                             token.save()
                             pair.save()
