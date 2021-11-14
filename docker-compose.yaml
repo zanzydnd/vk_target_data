@@ -21,13 +21,12 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      - redis
       - postgres
     environment:
       - DEBUG=True
       - REDIS_CONNECTION=redis://redis:6379
       - PYTHONBUFFERED=1
-      - CACHE_HOST=db
+      - CACHE_HOST=postgres
       - CACHE_USER=postgres
       - CACHE_PASSWORD=postgres
       - CACHE_NAME=collect_vk_data
@@ -40,11 +39,6 @@ services:
 
     volumes:
       - static:/app/static
-
-  redis:
-    image: redis:6-alpine
-    ports:
-      - 6379:6379
 
   postgres:
     image: postgres:13.4-alpine
