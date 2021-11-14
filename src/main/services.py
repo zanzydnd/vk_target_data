@@ -251,7 +251,3 @@ def butch_before_procs_info():
         i += 1
     return data
 
-
-def to_cache():
-    pass
-    # for combin in PairsWithSexAndAge
