@@ -16,7 +16,7 @@ from django.db.models import Sum
 
 
 def pick_points(interest_name: str, sex: str, age: str):
-    interest = InterestCategory.objects.using("cache").get(interes_name=interest_name)
+    # interest = InterestCategory.objects.using("cache").get(interes_name=interest_name)
 
     if sex == "-":
         sex = None
@@ -28,7 +28,7 @@ def pick_points(interest_name: str, sex: str, age: str):
     if age == "-":
         age = None
 
-    query = Q(interest=interest)
+    query = Q(interest__interest_name=interest_name)
 
     if sex:
         query &= Q(is_male=sex)
@@ -44,8 +44,10 @@ def pick_points(interest_name: str, sex: str, age: str):
     points = Result.objects.using("cache").filter(query).values('coordinate') \
         .annotate(count_of_person=Sum('count_of_person'))
 
+    print(Result.objects.using("cache").filter(query).values('coordinate').annotate(
+        count_of_person=Sum('count_of_person')).query)
+
     print(points)
-    print(points[0], points[1])
 
     return points
 
@@ -253,4 +255,3 @@ def butch_before_procs_info():
         data.append((api_key, (i * butch_size, i * butch_size + butch_size)))
         i += 1
     return data
-
