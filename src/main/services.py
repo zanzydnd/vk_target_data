@@ -190,6 +190,7 @@ async def parser_info(token, pairs_limit):
                                 update_cache.end_date = timezone.now()
                                 update_cache.count_of_person = int(response_data.get('audience_count'))
                                 update_cache.save(using='cache')
+                                print('updated in cache')
                             except Exception as e:
                                 entity_to_cache = Result(begin_date=timezone.now())
                                 entity_to_cache.interest = interest_from_chache
@@ -200,13 +201,14 @@ async def parser_info(token, pairs_limit):
                                 entity_to_cache.age_end = pair.age_end
                                 entity_to_cache.count_of_person = int(response_data.get('audience_count'))
                                 entity_to_cache.save(using='cache')
-
+                                print(e)
                             token.is_taken = False
                             token.save()
                             pair.save()
-                            entity.save()
+                            entity.save(using='default')
+                            print('saved default')
                         except Exception as e:
-                            pass
+                            print(e)
         del pairs
         i += 1000
 
