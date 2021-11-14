@@ -41,11 +41,11 @@ def pick_points(interest_name: str, sex: str, age: str):
     else:
         query &= Q(age_begin__isnull=False, age_end__isnull=True)
 
-    points = Result.objects.using("cache").filter(query).values('coordinate') \
-        .annotate(count_of_person=Sum('count_of_person'))
-
     print(Result.objects.using("cache").filter(query).values('coordinate').annotate(
         count_of_person=Sum('count_of_person')).query)
+
+    points = Result.objects.using("cache").filter(query).values('coordinate') \
+        .annotate(count_of_person=Sum('count_of_person'))
 
     print(points)
 
