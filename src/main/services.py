@@ -28,7 +28,7 @@ def pick_points(interest_name: str, sex: str, age: str):
     if age == "-":
         age = None
 
-    query = Q(interest__interest_name=interest_name)
+    query = Q(interest__interes_name=interest_name)
 
     if sex:
         query &= Q(is_male=sex)
