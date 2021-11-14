@@ -34,7 +34,7 @@ services:
       - CACHE_PORT=5432
       - DB_HOST=109.68.212.119
       - DB_USER=honepaUser2
-      - DB_PASSWORD=jkodfgUJ$&*hfgjdn3#7
+      - DB_PASSWORD=jkodfgUJ$$&*hfgjdn3#7
       - DB_NAME=collect_interes_vk_api
 
 
@@ -56,8 +56,6 @@ services:
       - POSTGRES_PASSWORD=postgres
     volumes:
       - db:/var/lib/postgresql/data
-
-
 
 
 volumes:
