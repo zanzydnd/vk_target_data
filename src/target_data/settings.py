@@ -98,11 +98,11 @@ DATABASES = {
     },
     'cache': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'db',
-        'PORT': 5432,
+        "NAME": os.environ.get("CACHE_NAME", "name"),
+        "USER": os.environ.get("CACHE_USER", "name"),
+        "PASSWORD": os.environ.get("CACHE_PASSWORD", "name"),
+        "HOST": os.environ.get("CACHE_HOST", "127.0.0.1"),
+        "PORT": os.environ.get("CACHE_PORT", "3306"),
     }
 }
 

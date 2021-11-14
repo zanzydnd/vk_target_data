@@ -9,4 +9,5 @@ COPY . .
 EXPOSE 8000
 
 RUN python3 src/manage.py collectstatic --noinput
-CMD python3 src/manage.py migrate && gunicorn target_data.wsgi --chdir src --bind 0.0.0.0 --preload --log-file -
+CMD python3 src/manage.py migrate --database=cache
+CMD python3 src/manage.py migrate --database=default && gunicorn target_data.wsgi --chdir src --bind 0.0.0.0 --preload --log-file -
